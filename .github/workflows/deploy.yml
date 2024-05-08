@@ -28,3 +28,15 @@ jobs:
 
     - name: Verify Pushed Image
       run: docker pull crimson03/first-cd-deploy:latest  # Replace with your Docker Hub username and repository
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          sudo docker pull crimson03/first-cd-deploy:latest
+          sudo docker stop first-cd-deploy || true
+          sudo docker rm first-cd-deploy || true
+          sudo docker run -d --name first-cd-deploy -p 3005:3000 crimson03/first-cd-deploy:latest
